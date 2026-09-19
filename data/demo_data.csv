@@ -1,0 +1,9 @@
+location_id,location_name,district,state,latitude,longitude,elevation_m,slope_deg,rainfall_24h_mm,soil_moisture_pct,ground_movement_mm,temperature_c,humidity_pct,risk_score,risk_level,status_notes
+LOC-SK-01,Mangan Hillside,North Sikkim,Sikkim,27.5097,88.5287,1310,38,185.0,84.0,7.8,16.5,94,83,CRITICAL,Torrential monsoon downpour; tension cracks along road cut
+LOC-MG-02,Sohra Cut-Slope,East Khasi Hills,Meghalaya,25.2702,91.7323,1484,34,155.0,78.0,5.2,19.0,92,71,HIGH,High saturation and runoff on limestone/sandstone escarpment
+LOC-AS-03,Haflong Valley Bypass,Dima Hasao,Assam,25.1764,93.0238,680,31,138.0,72.0,4.8,24.0,88,64,HIGH,Active slope creep near railway alignment and NH-54E
+LOC-AR-04,Tawang Pass Sector,Tawang,Arunachal Pradesh,27.5861,91.8594,3048,24,75.0,52.0,1.4,11.0,76,41,MODERATE,High altitude steep terrain with seasonal freeze-thaw and drizzle
+LOC-NL-05,Kohima Ridge North,Kohima,Nagaland,25.6751,94.1086,1444,26,82.0,55.0,1.8,18.5,78,44,MODERATE,Dissected shale hills subject to urban loading and drainage seep
+LOC-MN-06,Churachandpur Highway,Churachandpur,Manipur,24.3333,93.6667,922,28,92.0,61.0,2.3,22.0,81,48,MODERATE,Hill cutting for highway widening; moderate rainfall recorded
+LOC-MZ-07,Aizawl North Escarpment,Aizawl,Mizoram,23.7271,92.7176,1132,21,42.0,40.0,0.6,23.5,68,26,LOW,Pre-monsoon stable status; automated inclinometer stable
+LOC-TR-08,Jampui Hills Sector,North Tripura,Tripura,23.8500,92.2667,720,16,30.0,36.0,0.4,26.0,65,20,LOW,Gentle hill ranges; normal moisture and drainage clearance

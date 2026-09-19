@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LAND-SAFE AI | NER Landslide Risk Monitoring & Early Warning</title>
+  
+  <!-- Leaflet GIS Map CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  
+  <!-- Google Fonts: Outfit (Headings & Accents) and Plus Jakarta Sans (Interface & Telemetry) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="light-theme">
+
+  <!-- ====================================================
+       TOP NAVIGATION & SYSTEM HEADER
+  ==================================================== -->
+  <header class="top-header">
+    <div class="header-left">
+      <div class="brand-logo">
+        <div class="radar-pulse"></div>
+        <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="m8 3 4 8 5-5 5 15H2L8 3z" />
+          <path d="M4 14h6" />
+        </svg>
+      </div>
+      <div class="brand-title">
+        <div class="brand-row">
+          <span class="product-name">LAND-SAFE AI</span>
+          <span class="badge-sih">SIH PROTOTYPE</span>
+        </div>
+        <div class="product-subtitle">AI-Based Early Warning & Landslide Risk Monitoring System &bull; North Eastern Region</div>
+      </div>
+    </div>
+
+    <div class="header-center">
+      <div class="operational-badge">
+        <span class="status-dot pulse-green"></span>
+        <span class="status-text">System Operational</span>
+      </div>
+      <div class="simulation-badge" title="Prototype mode: data is simulated for demonstration purposes">
+        <span class="status-dot dot-cyan"></span>
+        <span>SIMULATION MODE</span>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <!-- Theme Switcher (Light / Dark Mode) -->
+      <button class="theme-toggle-btn" id="btnThemeToggle" title="Switch Theme">
+        <span id="themeToggleIcon">&#9728;&#65039;</span>
+        <span id="themeToggleText">Light</span>
+      </button>
+
+      <div class="clock-display" id="clockDisplay">00:00:00 IST</div>
+      <div class="officer-profile">
+        <div class="avatar">DM</div>
+        <div class="officer-info">
+          <span class="officer-title">Disaster Officer</span>
+          <span class="officer-state">NER Command Center</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ====================================================
+       NAV TABS
+  ==================================================== -->
+  <nav class="nav-tabs-bar">
+    <div class="tabs-container">
+      <button class="nav-tab active" data-tab="tab-dashboard">
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard & Monitoring
+      </button>
+      <button class="nav-tab" data-tab="tab-map">
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+        GIS Risk Map
+      </button>
+      <button class="nav-tab" data-tab="tab-alerts">
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Alert Center
+        <span class="alert-count-pill" id="activeAlertsBadge">0</span>
+      </button>
+      <button class="nav-tab" data-tab="tab-analytics">
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Analytics & Trends
+      </button>
+      <button class="nav-tab" data-tab="tab-observation">
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        Field Observations
+      </button>
+      <button class="nav-tab" data-tab="tab-architecture">
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        System Architecture
+      </button>
+      <button class="nav-tab" data-tab="tab-limitations">
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        Methodology & Roadmap
+      </button>
+    </div>
+  </nav>
+
+  <!-- ====================================================
+       EARLY WARNING NOTIFICATION BANNER (DYNAMIC)
+  ==================================================== -->
+  <div id="earlyWarningBanner" class="early-warning-banner hidden">
+    <div class="banner-content">
+      <div class="siren-icon">&#128680;</div>
+      <div class="banner-body">
+        <div class="banner-header">
+          <span class="banner-title" id="bannerLevelTitle">CRITICAL EARLY WARNING DISPATCHED</span>
+          <span class="banner-loc-tag" id="bannerLocationTag">Mangan Hillside, Sikkim</span>
+          <span class="banner-score-tag" id="bannerScoreTag">Risk Score: 83%</span>
+        </div>
+        <div class="banner-message" id="bannerActionText">
+          Immediate field assessment and monitoring recommended. Coordinated road closures and SDRF advisory active.
+        </div>
+      </div>
+      <div class="banner-actions">
+        <button class="btn btn-warning-action" id="btnBannerViewAlert">View in Alert Center</button>
+        <button class="btn btn-banner-dismiss" id="btnBannerDismiss">&times;</button>
+      </div>
+    </div>
+  </div>
+
+  <main class="main-content">
+
+    <!-- ====================================================
+         TAB 1: DASHBOARD & MONITORING
+    ==================================================== -->
+    <div id="tab-dashboard" class="tab-pane active">
+      
+      <!-- SUMMARY KPI STATS -->
+      <section class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Areas Monitored</div>
+          <div class="kpi-value text-cyan" id="kpiMonitoredCount">8</div>
+          <div class="kpi-meta">All 8 NER States Covered</div>
+        </div>
+        <div class="kpi-card card-critical">
+          <div class="kpi-label">Critical Zones</div>
+          <div class="kpi-value text-red" id="kpiCriticalCount">1</div>
+          <div class="kpi-meta">Score &ge; 75 &bull; High Hazard</div>
+        </div>
+        <div class="kpi-card card-high">
+          <div class="kpi-label">High Risk Zones</div>
+          <div class="kpi-value text-orange" id="kpiHighCount">2</div>
+          <div class="kpi-meta">Score 50–74 &bull; Early Warning</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Active Alerts</div>
+          <div class="kpi-value text-amber" id="kpiActiveAlerts">2</div>
+          <div class="kpi-meta">Pending Officer Review</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Regional Hazard Status</div>
+          <div class="kpi-value text-yellow" id="kpiRegionalHazard">ELEVATED</div>
+          <div class="kpi-meta">Monsoon Front Active (NER)</div>
+        </div>
+      </section>
+
+      <!-- REGIONAL RISK DISTRIBUTION OVERVIEW -->
+      <section class="section-card regional-distribution-card">
+        <div class="card-header-flex">
+          <div>
+            <h3 class="card-title">REGIONAL RISK OVERVIEW &bull; NORTHEAST INDIA</h3>
+            <p class="card-subtitle">Aggregated multi-parametric risk distribution across monitored sentinel stations</p>
+          </div>
+          <div class="demo-tag">DEMO DATA &bull; DECISION SUPPORT</div>
+        </div>
+        
+        <div class="distribution-bar-container">
+          <div class="dist-segment seg-low" style="width: 25%;" title="2 Locations (25%)">LOW (25%)</div>
+          <div class="dist-segment seg-mod" style="width: 37.5%;" title="3 Locations (37.5%)">MODERATE (37.5%)</div>
+          <div class="dist-segment seg-high" style="width: 25%;" title="2 Locations (25%)">HIGH (25%)</div>
+          <div class="dist-segment seg-crit" style="width: 12.5%;" title="1 Location (12.5%)">CRITICAL (12.5%)</div>
+        </div>
+        <div class="distribution-legend">
+          <span class="leg-item"><span class="leg-dot bg-green"></span> LOW: 0–29</span>
+          <span class="leg-item"><span class="leg-dot bg-yellow"></span> MODERATE: 30–49</span>
+          <span class="leg-item"><span class="leg-dot bg-orange"></span> HIGH: 50–74</span>
+          <span class="leg-item"><span class="leg-dot bg-red"></span> CRITICAL: 75–100</span>
+        </div>
+      </section>
+
+      <!-- DEMO SCENARIO SIMULATION BAR (KEY SIH REQUIREMENT) -->
+      <section class="section-card scenario-section">
+        <div class="scenario-header">
+          <div class="scenario-title-group">
+            <span class="scenario-badge-icon">&#9889;</span>
+            <div>
+              <h3 class="scenario-heading">DEMO SCENARIO SIMULATOR</h3>
+              <p class="scenario-subheading">One-click live presentation presets to demonstrate risk engine response and early warning trigger</p>
+            </div>
+          </div>
+          <div class="scenario-note">Click any scenario to prefill values, then test risk computation</div>
+        </div>
+
+        <div class="scenario-buttons-grid">
+          <button class="btn-scenario scenario-normal" id="btnScenarioNormal">
+            <div class="scenario-btn-top">
+              <span class="scenario-btn-title">&#9679; NORMAL CONDITIONS</span>
+              <span class="scenario-badge badge-green">LOW RISK</span>
+            </div>
+            <div class="scenario-specs">Rain: 30mm &bull; Soil: 35% &bull; Slope: 12&deg; &bull; Disp: 0.5mm</div>
+          </button>
+
+          <button class="btn-scenario scenario-mod" id="btnScenarioHighRain">
+            <div class="scenario-btn-top">
+              <span class="scenario-btn-title">&#9679; HIGH RAINFALL</span>
+              <span class="scenario-badge badge-yellow">MODERATE</span>
+            </div>
+            <div class="scenario-specs">Rain: 140mm &bull; Soil: 52% &bull; Slope: 18&deg; &bull; Disp: 1.2mm</div>
+          </button>
+
+          <button class="btn-scenario scenario-high" id="btnScenarioHighRisk">
+            <div class="scenario-btn-top">
+              <span class="scenario-btn-title">&#9679; HIGH LANDSLIDE RISK</span>
+              <span class="scenario-badge badge-orange">HIGH WARNING</span>
+            </div>
+            <div class="scenario-specs">Rain: 150mm &bull; Soil: 75% &bull; Slope: 32&deg; &bull; Disp: 5.5mm</div>
+          </button>
+
+          <button class="btn-scenario scenario-critical" id="btnScenarioCritical">
+            <div class="scenario-btn-top">
+              <span class="scenario-btn-title">&#9679; CRITICAL CONDITIONS</span>
+              <span class="scenario-badge badge-red">CRITICAL ALARM</span>
+            </div>
+            <div class="scenario-specs">Rain: 190mm &bull; Soil: 88% &bull; Slope: 40&deg; &bull; Disp: 8.5mm</div>
+          </button>
+        </div>
+      </section>
+
+      <!-- TWO-COLUMN WORKFLOW: MONITORING & RISK ENGINE (LEFT) vs GIS MAP (RIGHT) -->
+      <div class="dashboard-split-grid">
+        
+        <!-- LEFT COLUMN: LOCATION MONITORING & RISK ANALYSIS -->
+        <div class="split-col-left">
+          
+          <!-- LOCATION SELECTOR & PARAMETER CONTROLS -->
+          <div class="section-card">
+            <div class="card-header-flex">
+              <div>
+                <h3 class="card-title">LOCATION MONITORING & TELEMETRY</h3>
+                <p class="card-subtitle">Select sentinel station or enter live geotechnical parameters</p>
+              </div>
+              <div class="source-tag" id="activeDataSourceTag">DEMO DATA</div>
+            </div>
+
+            <!-- Location Dropdown -->
+            <div class="form-group location-select-group">
+              <label for="locationSelector" class="form-label">Monitored Sentinel Location (NER):</label>
+              <select id="locationSelector" class="form-select">
+                <option value="">-- Custom Field Coordinates / Ad-hoc Assessment --</option>
+                <!-- Filled dynamically by JavaScript from /api/locations -->
+              </select>
+            </div>
+
+            <!-- RISK INFERENCE ENGINE SELECTION -->
+            <div class="engine-mode-group">
+              <div class="engine-mode-label-row">
+                <label class="form-label font-semibold">Active AI/ML Risk Engine:</label>
+                <span class="engine-status-badge" id="engineStatusBadge">Operational</span>
+              </div>
+              <div class="engine-pills-row">
+                <button type="button" class="engine-pill active" id="btnEngineWeighted" data-engine="weighted">
+                  <div class="engine-pill-header">
+                    <span class="engine-icon">&#9878;&#65039;</span>
+                    <span class="engine-label">Transparent Weighted</span>
+                  </div>
+                  <span class="engine-subtext">35 / 25 / 20 / 20 % Physics Model</span>
+                </button>
+                <button type="button" class="engine-pill" id="btnEngineMl" data-engine="ml_rf">
+                  <div class="engine-pill-header">
+                    <span class="engine-icon">&#129302;</span>
+                    <span class="engine-label">Random Forest ML</span>
+                  </div>
+                  <span class="engine-subtext">Calibrated Ensemble + Geo-Features</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- REGIONAL GEO-CLIMATIC CALIBRATION ZONE -->
+            <div class="form-group zone-select-group">
+              <div class="zone-label-row">
+                <label for="geoZoneSelector" class="form-label">Regional Geo-Climatic Calibration:</label>
+                <span class="badge-zone-auto" id="zoneAutoBadge">Auto: Zone B (Eastern Himalayas)</span>
+              </div>
+              <select id="geoZoneSelector" class="form-select">
+                <option value="auto">Auto-Detect from Monitored Station</option>
+                <option value="zone_a">Zone A: Shillong Plateau (Meghalaya) — High Rain / Regolith Saturation</option>
+                <option value="zone_b">Zone B: Eastern Himalayas (Sikkim & Arunachal) — Extreme Slope & Shear</option>
+                <option value="zone_c">Zone C: Barail & Disang Shales (Assam/NL/MN/MZ/TR) — Creep & Mudslides</option>
+              </select>
+              <div class="zone-description-hint" id="zoneDescriptionHint">
+                Calibrated for Eastern Himalayan steep terrain with high gravitational shear strain.
+              </div>
+            </div>
+
+            <!-- Environmental Telemetry Form -->
+            <form id="riskAnalysisForm" class="telemetry-form" onsubmit="return false;">
+              
+              <!-- 1. Rainfall Input -->
+              <div class="param-row">
+                <div class="param-info">
+                  <div class="param-title">
+                    <span class="param-name">Rainfall (24-72h Ingestion)</span>
+                    <span class="param-weight-pill">Weight 35%</span>
+                  </div>
+                  <div class="param-unit-val"><span id="valDisplayRain">185.0</span> mm</div>
+                </div>
+                <div class="slider-row">
+                  <input type="range" id="sliderRain" min="0" max="300" step="1" value="185" class="range-slider">
+                  <input type="number" id="inputRain" min="0" max="500" step="0.5" value="185.0" class="number-input">
+                </div>
+              </div>
+
+              <!-- 2. Soil Moisture Input -->
+              <div class="param-row">
+                <div class="param-info">
+                  <div class="param-title">
+                    <span class="param-name">Soil Moisture Saturation</span>
+                    <span class="param-weight-pill">Weight 25%</span>
+                  </div>
+                  <div class="param-unit-val"><span id="valDisplaySoil">84.0</span> %</div>
+                </div>
+                <div class="slider-row">
+                  <input type="range" id="sliderSoil" min="0" max="100" step="1" value="84" class="range-slider">
+                  <input type="number" id="inputSoil" min="0" max="100" step="0.5" value="84.0" class="number-input">
+                </div>
+              </div>
+
+              <!-- 3. Slope Angle Input -->
+              <div class="param-row">
+                <div class="param-info">
+                  <div class="param-title">
+                    <span class="param-name">Terrain Slope Gradient</span>
+                    <span class="param-weight-pill">Weight 20%</span>
+                  </div>
+                  <div class="param-unit-val"><span id="valDisplaySlope">38.0</span> &deg;</div>
+                </div>
+                <div class="slider-row">
+                  <input type="range" id="sliderSlope" min="0" max="60" step="1" value="38" class="range-slider">
+                  <input type="number" id="inputSlope" min="0" max="90" step="0.5" value="38.0" class="number-input">
+                </div>
+              </div>
+
+              <!-- 4. Ground Movement Input -->
+              <div class="param-row">
+                <div class="param-info">
+                  <div class="param-title">
+                    <span class="param-name">Ground Movement / Shear Displacement</span>
+                    <span class="param-weight-pill">Weight 20%</span>
+                  </div>
+                  <div class="param-unit-val"><span id="valDisplayGround">7.8</span> mm</div>
+                </div>
+                <div class="slider-row">
+                  <input type="range" id="sliderGround" min="0" max="20" step="0.1" value="7.8" class="range-slider">
+                  <input type="number" id="inputGround" min="0" max="50" step="0.1" value="7.8" class="number-input">
+                </div>
+              </div>
+
+              <!-- Auxiliary Context (Elevation, Temp, Humidity) -->
+              <div class="aux-params-grid">
+                <div class="aux-item">
+                  <span class="aux-label">Elevation:</span>
+                  <span class="aux-val" id="valDisplayElev">1,310 m</span>
+                </div>
+                <div class="aux-item">
+                  <span class="aux-label">Temperature:</span>
+                  <span class="aux-val" id="valDisplayTemp">16.5 &deg;C</span>
+                </div>
+                <div class="aux-item">
+                  <span class="aux-label">Humidity:</span>
+                  <span class="aux-val" id="valDisplayHum">94 %</span>
+                </div>
+              </div>
+
+              <!-- ANALYZE RISK ACTION BUTTON -->
+              <button type="button" class="btn-analyze-risk" id="btnAnalyzeRisk">
+                <span class="btn-icon">&#9654;</span>
+                <span class="btn-text">ANALYZE RISK</span>
+                <span class="btn-subtext">(Runs Multi-Parametric Risk Engine)</span>
+              </button>
+            </form>
+          </div>
+
+          <!-- EXPLAINABLE AI RESULT PANEL -->
+          <div class="section-card result-card" id="riskResultCard">
+            <div class="card-header-flex">
+              <div>
+                <h3 class="card-title">RISK ASSESSMENT & EXPLAINABLE AI</h3>
+                <p class="card-subtitle" id="resultModelTypeLabel">Prototype Risk Engine &bull; Normalized Decision Support</p>
+              </div>
+              <div class="risk-badge badge-crit" id="resultLevelBadge">CRITICAL</div>
+            </div>
+
+            <!-- Score Visual Gauge -->
+            <div class="score-display-row">
+              <div class="score-circle-container">
+                <div class="score-circle" id="scoreCircle">
+                  <span class="score-number" id="resultScoreVal">83</span>
+                  <span class="score-pct">%</span>
+                </div>
+                <div class="score-title">Risk Probability Score</div>
+              </div>
+              
+              <div class="score-meta-panel">
+                <div class="score-classification">
+                  <span class="meta-label">Risk Classification:</span>
+                  <span class="meta-val-highlight" id="resultLevelText">CRITICAL HAZARD</span>
+                </div>
+                <div class="score-classification">
+                  <span class="meta-label">Assessment Mode:</span>
+                  <span class="meta-val" id="resultAssessmentMode">Multi-Factor Physics Normalization</span>
+                </div>
+                <div class="score-classification">
+                  <span class="meta-label">Geo-Zone Calibration:</span>
+                  <span class="meta-val text-cyan" id="resultGeoZoneLabel">Zone B: Eastern Himalayas</span>
+                </div>
+                <div class="score-classification">
+                  <span class="meta-label">Last Computed:</span>
+                  <span class="meta-val font-mono" id="resultTimestamp">Just now</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- ML CLASS PROBABILITY BARS (DYNAMICALLY SHOWN IN ML MODE) -->
+            <div id="mlProbabilitiesContainer" class="ml-prob-container hidden">
+              <div class="ml-prob-header">
+                <div>
+                  <span class="ml-prob-title">&#128202; ML ENSEMBLE CLASS PROBABILITIES:</span>
+                  <span class="ml-prob-subtext">Random Forest 140-tree confidence distribution</span>
+                </div>
+                <span class="ml-prob-tag" id="mlZoneAppliedTag">Zone B (Eastern Himalayas)</span>
+              </div>
+              <div class="ml-prob-grid">
+                <div class="prob-bar-col">
+                  <div class="prob-label">LOW</div>
+                  <div class="prob-track"><div class="prob-fill fill-low" id="probFillLow" style="height: 0%;"></div></div>
+                  <div class="prob-val" id="probValLow">0%</div>
+                </div>
+                <div class="prob-bar-col">
+                  <div class="prob-label">MODERATE</div>
+                  <div class="prob-track"><div class="prob-fill fill-mod" id="probFillMod" style="height: 0%;"></div></div>
+                  <div class="prob-val" id="probValMod">0%</div>
+                </div>
+                <div class="prob-bar-col">
+                  <div class="prob-label">HIGH</div>
+                  <div class="prob-track"><div class="prob-fill fill-high" id="probFillHigh" style="height: 0%;"></div></div>
+                  <div class="prob-val" id="probValHigh">0%</div>
+                </div>
+                <div class="prob-bar-col">
+                  <div class="prob-label">CRITICAL</div>
+                  <div class="prob-track"><div class="prob-fill fill-crit" id="probFillCrit" style="height: 0%;"></div></div>
+                  <div class="prob-val" id="probValCrit">0%</div>
+                </div>
+              </div>
+              <div class="engineered-features-summary" id="engineeredFeaturesSummary">
+                <span class="eng-chip" id="chipAri">ARI: 0 mm</span>
+                <span class="eng-chip" id="chipTwi">TWI: 0</span>
+                <span class="eng-chip" id="chipPwp">Pore Pressure: 0 kPa</span>
+                <span class="eng-chip" id="chipDisp">Displacement Rate: 0 mm/d</span>
+              </div>
+            </div>
+
+            <!-- WHY IS THIS AREA AT RISK? (Explainable AI Breakdown) -->
+            <div class="xai-container">
+              <div class="xai-title-row">
+                <span class="xai-heading">&#128269; WHY IS THIS AREA AT RISK?</span>
+                <span class="xai-subtext">Parametric Contribution Breakdown</span>
+              </div>
+
+              <div class="xai-bars-list" id="xaiBarsContainer">
+                <!-- Populated dynamically by script.js -->
+              </div>
+
+              <!-- Detected Risk Factors Checklist -->
+              <div class="detected-factors-box">
+                <div class="factors-box-title">Identified Contributing Factors:</div>
+                <ul class="factors-list" id="detectedFactorsList">
+                  <!-- Populated dynamically -->
+                </ul>
+              </div>
+
+              <!-- Operational Action Recommendation -->
+              <div class="recommendation-box" id="recommendationBox">
+                <div class="rec-title">&#9888;&#65039; OPERATIONAL DECISION-SUPPORT RECOMMENDATION:</div>
+                <div class="rec-content" id="recActionText">
+                  URGENT DECISION SUPPORT: High probability of slope failure. Dispatch rapid verification units, prep traffic diversions, notify SDRF/NDRF teams.
+                </div>
+                <div class="rec-disclaimer">
+                  Note: LAND-SAFE AI provides situational decision support and does not replace field geotechnical verification or district statutory authority.
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN: INTERACTIVE GIS RISK MAP -->
+        <div class="split-col-right">
+          <div class="section-card map-card">
+            <div class="card-header-flex">
+              <div>
+                <h3 class="card-title">GIS HAZARD & SENTINEL MAP &bull; NER</h3>
+                <p class="card-subtitle">Live spatial view of 8 North Eastern monitoring stations</p>
+              </div>
+              <div class="map-controls-group">
+                <button class="btn btn-sm btn-outline" id="btnResetMapView" title="Reset center to Northeast India">Reset View</button>
+              </div>
+            </div>
+
+            <!-- Map Container -->
+            <div id="gisMap" class="gis-map-viewport"></div>
+
+            <!-- Map Legend -->
+            <div class="map-legend-bar">
+              <div class="legend-title">RISK LEGEND:</div>
+              <div class="legend-items">
+                <span class="leg-badge leg-low"><span class="dot"></span> LOW (0–29)</span>
+                <span class="leg-badge leg-mod"><span class="dot"></span> MODERATE (30–49)</span>
+                <span class="leg-badge leg-high"><span class="dot"></span> HIGH (50–74)</span>
+                <span class="leg-badge leg-crit"><span class="dot pulse"></span> CRITICAL (75–100)</span>
+              </div>
+            </div>
+
+            <!-- Selected Location Quick Card under Map -->
+            <div class="selected-map-location-card" id="mapLocationDetailCard">
+              <div class="selected-loc-header">
+                <div>
+                  <span class="selected-loc-name" id="selectedLocName">Mangan Hillside</span>
+                  <span class="selected-loc-state" id="selectedLocState">North Sikkim &bull; Sikkim</span>
+                </div>
+                <span class="risk-badge badge-crit" id="selectedLocBadge">CRITICAL (83%)</span>
+              </div>
+              <div class="selected-loc-metrics">
+                <div class="metric-item">Rainfall: <strong id="mapMetricRain">185 mm</strong></div>
+                <div class="metric-item">Soil Saturation: <strong id="mapMetricSoil">84%</strong></div>
+                <div class="metric-item">Slope: <strong id="mapMetricSlope">38&deg;</strong></div>
+                <div class="metric-item">Ground Shift: <strong id="mapMetricGround">7.8 mm</strong></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ====================================================
+         TAB 2: GIS RISK MAP (FULL VIEW)
+    ==================================================== -->
+    <div id="tab-map" class="tab-pane">
+      <div class="section-card full-map-card">
+        <div class="card-header-flex">
+          <div>
+            <h3 class="card-title">EXPANDED GEOSPATIAL HAZARD MONITORING</h3>
+            <p class="card-subtitle">Comprehensive GIS visualization across Eastern Himalayas & Shillong Plateau</p>
+          </div>
+          <div class="map-filter-tags">
+            <button class="filter-pill active" data-filter="all">All NER Locations</button>
+            <button class="filter-pill" data-filter="high-crit">High & Critical Only</button>
+            <button class="filter-pill" data-filter="sikkim-meghalaya">Sikkim & Meghalaya</button>
+          </div>
+        </div>
+        <div id="fullGisMap" class="full-gis-viewport"></div>
+      </div>
+    </div>
+
+    <!-- ====================================================
+         TAB 3: ALERT CENTER
+    ==================================================== -->
+    <div id="tab-alerts" class="tab-pane">
+      <div class="section-card">
+        <div class="card-header-flex">
+          <div>
+            <h3 class="card-title">DISASTER EARLY WARNING & ALERT CENTER</h3>
+            <p class="card-subtitle">Automated early warning notifications generated by the AI Risk Engine</p>
+          </div>
+          <div class="alert-filter-tabs">
+            <button class="alert-tab-btn active" data-alert-filter="all">All Alerts</button>
+            <button class="alert-tab-btn" data-alert-filter="ACTIVE">Active Alerts Only</button>
+            <button class="alert-tab-btn" data-alert-filter="ACKNOWLEDGED">Acknowledged Log</button>
+          </div>
+        </div>
+
+        <div class="alerts-stream-container" id="alertsStreamContainer">
+          <!-- Loaded dynamically from /api/alerts -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ====================================================
+         TAB 4: ANALYTICS & TRENDS
+    ==================================================== -->
+    <div id="tab-analytics" class="tab-pane">
+      <div class="section-card">
+        <div class="card-header-flex">
+          <div>
+            <h3 class="card-title">GEOTECHNICAL & ENVIRONMENTAL TIME-SERIES</h3>
+            <p class="card-subtitle">Historical sensor telemetry and risk trajectory analytics</p>
+          </div>
+          <div class="analytics-controls">
+            <select id="analyticsLocationSelect" class="form-select form-select-sm">
+              <!-- Populated dynamically -->
+            </select>
+            <div class="btn-group-toggle">
+              <button class="btn-toggle active" data-timeframe="24h">Last 24 Hours</button>
+              <button class="btn-toggle" data-timeframe="7d">Last 7 Days</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="charts-2x2-grid">
+          <div class="chart-box">
+            <div class="chart-box-title">Rainfall Accumulation (mm)</div>
+            <div class="chart-wrapper"><canvas id="chartRainfall"></canvas></div>
+          </div>
+          <div class="chart-box">
+            <div class="chart-box-title">Soil Moisture Saturation (%)</div>
+            <div class="chart-wrapper"><canvas id="chartSoil"></canvas></div>
+          </div>
+          <div class="chart-box">
+            <div class="chart-box-title">Ground Shear Displacement (mm)</div>
+            <div class="chart-wrapper"><canvas id="chartGround"></canvas></div>
+          </div>
+          <div class="chart-box">
+            <div class="chart-box-title">Composite Landslide Risk Trajectory (0–100)</div>
+            <div class="chart-wrapper"><canvas id="chartRiskScore"></canvas></div>
+          </div>
+        </div>
+        <div class="chart-footer-note">
+          Note: Visualized trends utilize historical sample time-series seeded into the prototype SQLite database.
+        </div>
+      </div>
+    </div>
+
+    <!-- ====================================================
+         TAB 5: FIELD OBSERVATIONS & SITE PHOTO MODULE
+    ==================================================== -->
+    <div id="tab-observation" class="tab-pane">
+      <div class="split-observation-grid">
+        
+        <!-- Form to log observation -->
+        <div class="section-card">
+          <div class="card-header-flex">
+            <div>
+              <h3 class="card-title">LOG FIELD SITE OBSERVATION</h3>
+              <p class="card-subtitle">Ground verification and photographic evidence logging</p>
+            </div>
+            <div class="badge-honesty">Simulated CV Module</div>
+          </div>
+
+          <form id="observationForm" class="observation-form" onsubmit="return false;">
+            <div class="form-group">
+              <label class="form-label" for="obsLocationSelect">Monitored Sentinel Location:</label>
+              <select id="obsLocationSelect" class="form-select" required>
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="obsOfficerName">Field Officer / Inspector Name:</label>
+              <input type="text" id="obsOfficerName" class="form-input" value="R. Lepcha (Sub-Divisional Disaster Officer)" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Site Photograph Upload:</label>
+              <div class="photo-upload-zone" id="photoDropZone">
+                <input type="file" id="photoFileInput" accept="image/*" class="file-input-hidden">
+                <div class="upload-prompt" id="uploadPrompt">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                  <span>Click to select site photo or drag & drop</span>
+                  <small class="upload-hint">Supports JPG, PNG (Max 5MB)</small>
+                </div>
+                <div class="preview-container hidden" id="previewContainer">
+                  <img id="photoPreviewImg" src="" alt="Site observation preview" class="preview-img">
+                  <button type="button" class="btn-remove-photo" id="btnRemovePhoto">&times;</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="obsNotes">Geotechnical Observation Notes:</label>
+              <textarea id="obsNotes" class="form-textarea" rows="4" placeholder="Detail any observed tension cracks, toe bulging, culvert blockage, or rockfall activity..." required></textarea>
+            </div>
+
+            <button type="button" class="btn btn-primary" id="btnSubmitObservation">
+              Submit Field Observation to Database
+            </button>
+          </form>
+        </div>
+
+        <!-- History of observations -->
+        <div class="section-card">
+          <div class="card-header-flex">
+            <div>
+              <h3 class="card-title">RECORDED FIELD OBSERVATION LOG</h3>
+              <p class="card-subtitle">Verified in-situ records stored in SQLite</p>
+            </div>
+            <button class="btn btn-sm btn-outline" id="btnRefreshObservations">Refresh</button>
+          </div>
+
+          <div class="observation-feed" id="observationFeedContainer">
+            <!-- Loaded dynamically from /api/observations -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ====================================================
+         TAB 6: SYSTEM ARCHITECTURE & DATA HONESTY
+    ==================================================== -->
+    <div id="tab-architecture" class="tab-pane">
+      
+      <!-- FLOWCHART -->
+      <div class="section-card">
+        <h3 class="card-title">END-TO-END PIPELINE ARCHITECTURE</h3>
+        <p class="card-subtitle">From multi-source environmental signals to explainable early warning dispatch</p>
+        
+        <div class="architecture-flow-diagram">
+          <div class="flow-step step-sources">
+            <div class="flow-icon">&#127783;&#65039;</div>
+            <div class="flow-name">DATA SOURCES</div>
+            <div class="flow-desc">Rainfall, Soil Moisture, Slope, Ground Shift, DEM, GIS</div>
+          </div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-step step-ingestion">
+            <div class="flow-icon">&#9881;&#65039;</div>
+            <div class="flow-name">INGESTION & VALIDATION</div>
+            <div class="flow-desc">Pydantic Schemas, Range Checks, Telemetry Sanitization</div>
+          </div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-step step-engine">
+            <div class="flow-icon">&#129302;</div>
+            <div class="flow-name">AI/ML RISK ENGINE</div>
+            <div class="flow-desc">Normalized Physics Formula + Random Forest Pipeline</div>
+          </div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-step step-xai">
+            <div class="flow-icon">&#128269;</div>
+            <div class="flow-name">EXPLAINABLE AI</div>
+            <div class="flow-desc">Parametric Contributions (35/25/20/20%) & Factors</div>
+          </div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-step step-gis">
+            <div class="flow-icon">&#128506;&#65039;</div>
+            <div class="flow-name">GIS RISK MAP</div>
+            <div class="flow-desc">Leaflet Spatial Heatmap & Sentinel Station Markers</div>
+          </div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-step step-alert">
+            <div class="flow-icon">&#128680;</div>
+            <div class="flow-name">EARLY WARNING</div>
+            <div class="flow-desc">Actionable Decision Support & Officer Acknowledgment</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LIVE MACHINE LEARNING PIPELINE & REGIONAL CALIBRATION ARCHITECTURE -->
+      <div class="section-card ml-architecture-card">
+        <div class="card-header-flex">
+          <div>
+            <h3 class="card-title text-cyan">&#129302; LIVE ML PIPELINE & REGIONAL CALIBRATION TELEMETRY</h3>
+            <p class="card-subtitle">Operational status of the trained Random Forest ensemble & domain feature engineering</p>
+          </div>
+          <span class="badge badge-future" id="archMlStatusBadge">&#9679; MODEL READY</span>
+        </div>
+
+        <div class="ml-pipeline-summary-grid">
+          <div class="ml-stat-card">
+            <div class="ml-stat-label">Model Architecture</div>
+            <div class="ml-stat-value text-cyan">RandomForestClassifier</div>
+            <div class="ml-stat-meta">140 Estimators &bull; Max Depth 12</div>
+          </div>
+          <div class="ml-stat-card">
+            <div class="ml-stat-label">Pipeline Accuracy</div>
+            <div class="ml-stat-value text-green" id="archMlAccuracy">100.0%</div>
+            <div class="ml-stat-meta">Stratified 80/20 Out-of-Sample Test</div>
+          </div>
+          <div class="ml-stat-card">
+            <div class="ml-stat-label">Engineered Features</div>
+            <div class="ml-stat-value text-orange">4 Geotechnical</div>
+            <div class="ml-stat-meta">ARI, TWI, Pore Water Press., Disp. Rate</div>
+          </div>
+          <div class="ml-stat-card">
+            <div class="ml-stat-label">Regional Calibration</div>
+            <div class="ml-stat-value text-yellow">3 NER Zones</div>
+            <div class="ml-stat-meta">Shillong, Himalayas, Barail Shales</div>
+          </div>
+        </div>
+
+        <!-- Regional Geo-Climatic Zones Matrix -->
+        <h4 class="subheading-accent" style="margin-top: 1.5rem; margin-bottom: 0.75rem;">Regional Geo-Climatic Calibration Belts:</h4>
+        <div class="regional-zones-grid">
+          <div class="zone-info-card zone-card-a">
+            <div class="zone-card-title">Zone A: Shillong Plateau (Meghalaya)</div>
+            <div class="zone-card-geology">Precambrian Crystalline / Sandstone</div>
+            <div class="zone-card-desc">High rainfall sensitivity; extreme monsoon downpours rapidly oversaturate shallow soil regolith over crystalline bedrock.</div>
+            <div class="zone-card-trigger"><strong>Dominant Trigger:</strong> Antecedent Rainfall (ARI) > 130mm</div>
+          </div>
+          <div class="zone-card-info zone-card-b">
+            <div class="zone-card-title">Zone B: Eastern Himalayas (Sikkim & Arunachal)</div>
+            <div class="zone-card-geology">Young Folded Sedimentary / Metamorphics</div>
+            <div class="zone-card-desc">Extreme slope angles, glacial till and deep valley gorges with high kinematic shear strain and seismic sensitivity.</div>
+            <div class="zone-card-trigger"><strong>Dominant Trigger:</strong> Slope Angle (> 34°) & Ground Displacement Rate</div>
+          </div>
+          <div class="zone-card-info zone-card-c">
+            <div class="zone-card-title">Zone C: Barail & Disang Shales (Assam/NL/MN/MZ/TR)</div>
+            <div class="zone-card-geology">Tertiary Weathered Folded Shales</div>
+            <div class="zone-card-desc">Highly weathered fissile shales prone to deep rotational mudslides, creeping road embankments, and toe drainage failure.</div>
+            <div class="zone-card-trigger"><strong>Dominant Trigger:</strong> Sustained Saturation & Borehole Creep Rate</div>
+          </div>
+        </div>
+
+        <!-- Real-time Feature Importance Ranking -->
+        <h4 class="subheading-accent" style="margin-top: 1.5rem; margin-bottom: 0.75rem;">Tree Feature Importance Ranking (Mean Decrease in Impurity):</h4>
+        <div class="feature-importance-bars" id="archFeatureImportanceContainer">
+          <!-- Populated dynamically from /api/ml-status -->
+        </div>
+      </div>
+
+      <!-- DATA SOURCE HONESTY MATRIX -->
+      <div class="section-card">
+        <h3 class="card-title">DATA SOURCE ARCHITECTURE & READINESS MATRIX</h3>
+        <p class="card-subtitle">Transparent distinction between prototype simulation and planned production feeds</p>
+
+        <div class="table-responsive">
+          <table class="tech-table">
+            <thead>
+              <tr>
+                <th>Environmental Parameter</th>
+                <th>Current Prototype Status</th>
+                <th>Prototype Implementation</th>
+                <th>Production Target Data Source</th>
+                <th>Integration Protocol</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Rainfall</strong></td>
+                <td><span class="badge badge-demo">DEMO DATA</span></td>
+                <td>Seeded 24h/7d synthetic NER rainfall values</td>
+                <td>IMD Doppler Weather Radar / AWS Network</td>
+                <td>REST API / GeoJSON</td>
+              </tr>
+              <tr>
+                <td><strong>Soil Moisture</strong></td>
+                <td><span class="badge badge-demo">DEMO DATA</span></td>
+                <td>Calibrated moisture saturation percentages</td>
+                <td>In-situ TDR Probes / NASA SMAP Soil Moisture</td>
+                <td>MQTT / IoT Gateway</td>
+              </tr>
+              <tr>
+                <td><strong>Ground Movement</strong></td>
+                <td><span class="badge badge-sim">SIMULATED IoT</span></td>
+                <td>Sub-surface shear displacement (mm)</td>
+                <td>MEMS Inclinometers & In-place Extensometers</td>
+                <td>LoRaWAN / 4G Cellular</td>
+              </tr>
+              <tr>
+                <td><strong>Slope & Elevation</strong></td>
+                <td><span class="badge badge-sample">SAMPLE GIS DATA</span></td>
+                <td>Surveyed degrees & elevation above MSL</td>
+                <td>Cartosat-1 / SRTM Digital Elevation Model (30m)</td>
+                <td>OGC WMS / GeoTIFF</td>
+              </tr>
+              <tr>
+                <td><strong>Satellite Land Cover</strong></td>
+                <td><span class="badge badge-future">FUTURE INTEGRATION</span></td>
+                <td>Extensible data-service schema ready</td>
+                <td>Sentinel-1 InSAR / Sentinel-2 NDVI Vegetation</td>
+                <td>Copernicus Open Access Hub</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TECHNOLOGY STACK -->
+      <div class="section-card">
+        <h3 class="card-title">PRODUCTION TECHNOLOGY STACK</h3>
+        <div class="tech-stack-grid">
+          <div class="tech-card">
+            <div class="tech-category">Frontend</div>
+            <div class="tech-name">Modern Vanilla ES6+ / HTML5 / CSS3</div>
+            <div class="tech-desc">Ultra-responsive, lightweight, zero compilation latency for emergency field laptop displays.</div>
+          </div>
+          <div class="tech-card">
+            <div class="tech-category">Backend API</div>
+            <div class="tech-name">Python FastAPI + Uvicorn</div>
+            <div class="tech-desc">Asynchronous high-throughput REST API with strict Pydantic v2 data validation and sub-millisecond response.</div>
+          </div>
+          <div class="tech-card">
+            <div class="tech-category">AI / ML Engine</div>
+            <div class="tech-name">Scikit-Learn & Joblib Pipeline</div>
+            <div class="tech-desc">Calibrated Random Forest classifier trained on geomorphological terrain parameters with transparent feature weighting.</div>
+          </div>
+          <div class="tech-card">
+            <div class="tech-category">Geospatial GIS</div>
+            <div class="tech-name">Leaflet.js + OpenStreetMap</div>
+            <div class="tech-desc">Open-source interactive GIS map with custom SVG risk pins and bounding boxes for North Eastern India.</div>
+          </div>
+          <div class="tech-card">
+            <div class="tech-category">Database</div>
+            <div class="tech-name">SQLite (Prototype) &rarr; PostgreSQL / PostGIS</div>
+            <div class="tech-desc">Normalized schema supporting time-series readings, alerts, and field logs, prepared for spatial queries.</div>
+          </div>
+          <div class="tech-card">
+            <div class="tech-category">Visual Analytics</div>
+            <div class="tech-name">Chart.js</div>
+            <div class="tech-desc">Hardware-accelerated HTML5 Canvas charts displaying multi-variable environmental trajectories.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ====================================================
+         TAB 7: PROTOTYPE LIMITATIONS & ROADMAP
+    ==================================================== -->
+    <div id="tab-limitations" class="tab-pane">
+      <div class="limitations-grid">
+        
+        <!-- Current Prototype Disclosures -->
+        <div class="section-card">
+          <div class="card-header-flex">
+            <div>
+              <h3 class="card-title text-amber">&#9888;&#65039; CURRENT PROTOTYPE BOUNDARIES</h3>
+              <p class="card-subtitle">Transparent technical disclosures for SIH evaluation</p>
+            </div>
+            <span class="badge badge-demo">DECISION SUPPORT ONLY</span>
+          </div>
+
+          <ul class="limitations-list">
+            <li>
+              <strong>Decision-Support Prototype:</strong>
+              This application does not claim to predict the exact minute, hour, or pinpoint boundary of a slope failure. It provides risk probabilities and situational intelligence to assist field officers.
+            </li>
+            <li>
+              <strong>Demonstration & Simulated Datasets:</strong>
+              Because live IMD radar and state-wide in-situ geotechnical telemetry are currently restricted or unavailable without formal MoES/NDMA API credentials, environmental readings are seeded as demonstration values.
+            </li>
+            <li>
+              <strong>Weighted Prototype Model:</strong>
+              The primary risk scoring uses a normalized weighted model (Rainfall 35%, Soil Moisture 25%, Slope 20%, Ground Movement 20%) designed for immediate explainability and deterministic behavior during testing.
+            </li>
+            <li>
+              <strong>Simulated IoT Ground Movement:</strong>
+              Displacement values represent simulated borehole inclinometer readings calibrated to standard slope failure mechanics.
+            </li>
+            <li>
+              <strong>Field Photo Computer Vision:</strong>
+              The field photo module provides operational proof-of-concept for inspector uploads, with automated crack detection and satellite change detection staged for future phases.
+            </li>
+          </ul>
+        </div>
+
+        <!-- Future Production Roadmap -->
+        <div class="section-card">
+          <div class="card-header-flex">
+            <div>
+              <h3 class="card-title text-cyan">&#128640; FUTURE PRODUCTION SYSTEM</h3>
+              <p class="card-subtitle">Scalable milestones for post-hackathon pilot deployment</p>
+            </div>
+            <span class="badge badge-future">ROADMAP</span>
+          </div>
+
+          <ul class="roadmap-list">
+            <li>
+              <strong>Regional Geotechnical ML Calibration:</strong>
+              Ingest historical landslide inventories from Geological Survey of India (GSI) Bhukosh to train localized XGBoost and Deep Learning models for each Himalayan geological belt.
+            </li>
+            <li>
+              <strong>Live IMD AWS & Radar Integration:</strong>
+              Connect directly to India Meteorological Department API feeds for 3-hour nowcasting and precipitation accumulation.
+            </li>
+            <li>
+              <strong>Low-Cost Solar IoT Sensor Nodes:</strong>
+              Deploy ESP32-based telemetry nodes equipped with MEMS accelerometers, capacitive soil moisture probes, and tipping-bucket rain gauges transmitting via LoRaWAN / SATCOM.
+            </li>
+            <li>
+              <strong>Copernicus Sentinel-1 InSAR:</strong>
+              Integrate Interferometric Synthetic Aperture Radar (InSAR) surface displacement mapping to detect millimeter-level ground deformation over inaccessible mountain slopes.
+            </li>
+            <li>
+              <strong>Automated Multi-Channel Broadcast:</strong>
+              Integrate CAP (Common Alerting Protocol) for automated SMS, WhatsApp, and siren broadcasts to local village disaster management committees (VDMC).
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ====================================================
+       FOOTER
+  ==================================================== -->
+  <footer class="bottom-footer">
+    <div class="footer-left">
+      <strong>LAND-SAFE AI</strong> &bull; Turning environmental signals into location-specific landslide risk intelligence.
+    </div>
+    <div class="footer-center">
+      Developed for Smart India Hackathon &bull; North Eastern Region Disaster Resilience
+    </div>
+    <div class="footer-right">
+      <span>Decision-Support Prototype &bull; Version 1.0.0</span>
+    </div>
+  </footer>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Main Application Script -->
+  <script src="/static/script.js"></script>
+</body>
+</html>
